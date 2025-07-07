@@ -1,6 +1,6 @@
 #Beatriz Sousa da Cruz, Isabella Lelis Moreno, Iuri Castro Bessa.
 
-### Declaração de variáveis
+### Declaração de variáveis 
 
 #começa declarando um sudoku vazio
 sudoku = [
