@@ -1,5 +1,7 @@
 #Beatriz Sousa da Cruz, Isabella Lelis Moreno, Iuri Castro Bessa.
 
+import sys
+
 ### Declaração de variáveis 
 
 #começa declarando um sudoku vazio
@@ -27,18 +29,12 @@ sudoku = [
     list("    A   B   C    D   E   F    G   H   I")
 ]
 
-#Lembrar de colocar aqui a variavel que na entrada corresponde a coluna
-j = "D" 
-#Lembrar de colocar aqui a variavel que na entrada corresponde a linha
-i = "7"
-#numero que vai ser adicionado no sudoku 
-k = 5 
-
 #Dicionário com as colunas pra ser mais fácil de adicionar as entradas
-Coluna = {"A" : 4, "B" : 8, "C" : 12, "D" : 17, "E" : 21, "F" :25, "G" : 30, "H" : 34, "I": 38} 
+coluna_matriz = {"A" : 4, "B" : 8, "C" : 12, "D" : 17, "E" : 21, "F" :25, "G" : 30, "H" : 34, "I": 38} 
 
 #Dicionario com o espaco correspondente as linhas da entrada
-Linha = {"1": 2 ,"2" : 4, "3" : 6, "4" : 8, "5":10, "6": 12, "7": 14, "8": 16, "9" : 18} 
+linha_matriz = {"1": 2 ,"2" : 4, "3" : 6, "4" : 8, "5":10, "6": 12, "7": 14, "8": 16, "9" : 18} 
+
 
 ### Declaração de funções
 
@@ -55,7 +51,32 @@ def imprimir_matriz(sudoku):
 
 ### Principal
 
-sudoku[Linha[i]][Coluna[j]]= pintar(k)
+#Criando uma lista dos parametos de entrada
+parametros = sys.argv
+#Pegando a quantidade de arquivos de entrada, tirando o nome do programa
+quantidade_arquivos = len(parametros) -1
 
-imprimir_matriz(sudoku)
+#Verificando se o usuario entrou com um arquivo
+if (quantidade_arquivos == 1):
+    #Pegando o nome do arquivo das pistas
+    pistas_arqv1= sys.argv[1]
+    quantidade_pistas = 0
+ 
+    #Lendo o arquivo
+    with open (pistas_arqv1, 'r') as arquivo:
+        for pistas in arquivo:
+            pista = pistas.split(',')
+            pista_linha_valor = pista[1].split(":")
+            
+            coluna = pista[0].strip()
+            linha = pista_linha_valor[0].strip()
+            valor = pista_linha_valor[1].strip()
 
+            sudoku[linha_matriz[linha]][coluna_matriz[coluna.upper()]] = pintar(valor)
+            quantidade_pistas += 1
+
+    imprimir_matriz(sudoku)
+
+    if (quantidade_pistas<1 or quantidade_pistas>80):
+        print("Quantidade de pistas inválidas. Precisa haver uma quantidade de 1 até 80")
+        sys.exit(1)
