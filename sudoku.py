@@ -97,10 +97,10 @@ def ler_arquivo_jogadas(jogadas_arqv):
             # Pegando a coluna, linha e valor da jogada
             coluna = jogada[0].strip().upper()
             linha = jogada_linha_valor[0].strip()
-            valor = int(jogada_linha_valor[1].strip())
+            valor = jogada_linha_valor[1].strip()
 
             # Verifica se o formato da jogada é válido
-            if coluna not in coluna_matriz or linha not in linha_matriz or valor not in range(1, 10):
+            if coluna not in coluna_matriz or linha not in linha_matriz or int(valor) not in range(1, 10):
                 print(f"A jogada ({coluna},{linha}) = {valor} é inválida!")
             else:
                 todas_jogadas.append((linha, coluna, valor))
