@@ -57,9 +57,10 @@ def imprimir_matriz(sudoku):
         # Junta os caracteres da linha e imprime
         print("".join(linha))  
 
-# Função para ler arquivo 
+
+# Função para ler arquivo pistas
 def ler_arquivo_pistas(pistas_arqv): 
-    quantidade_pistas = 0
+    todas_pistas = []
 
     # Lendo o arquivo
     with open (pistas_arqv, 'r') as arquivo:
@@ -71,17 +72,40 @@ def ler_arquivo_pistas(pistas_arqv):
             pista_linha_valor = pista[1].split(":")
             
             # Pegando a coluna, linha e valor da pista
-            coluna = pista[0].strip()
+            coluna = pista[0].strip().upper()
             linha = pista_linha_valor[0].strip()
             valor = pista_linha_valor[1].strip()
 
-            # Preenchendo a matriz com os valores das pistas
-            matriz[linha_matriz[linha]][coluna_matriz[coluna.upper()]] = int(valor)
+            matriz[linha_matriz[linha]][coluna_matriz[coluna]] = int(valor)
+            todas_pistas.append((linha, coluna, valor))
+           
+    return todas_pistas
 
-            # Contando a quantidade de pistas
-            quantidade_pistas += 1
+# Função para ler arquivo jogadas
+def ler_arquivo_jogadas(jogadas_arqv): 
+    todas_jogadas = []
 
-    return quantidade_pistas
+    # Lendo o arquivo
+    with open (jogadas_arqv, 'r') as arquivo:
+        # Pecorrendo as linhas do arquivo
+        for jogadas in arquivo:
+            # Separando as colunas do resto da jogada
+            jogada = jogadas.split(',')
+            # Separando a linha e o valor da jogada
+            jogada_linha_valor = jogada[1].split(":")
+            
+            # Pegando a coluna, linha e valor da jogada
+            coluna = jogada[0].strip().upper()
+            linha = jogada_linha_valor[0].strip()
+            valor = int(jogada_linha_valor[1].strip())
+
+            # Verifica se o formato da jogada é válido
+            if coluna not in coluna_matriz or linha not in linha_matriz or valor not in range(1, 10):
+                print(f"A jogada ({coluna},{linha}) = {valor} é inválida!")
+            else:
+                todas_jogadas.append((linha, coluna, valor))
+           
+    return todas_jogadas
 
 # Função que verifica se os quadrantes da matriz está preenchida corretamente
 def validar_quadrante(matriz):
@@ -127,32 +151,92 @@ def validar_colunas(matriz):
     return True
 
 # Função para validar as pistas
-def validar_pistas(quantidade):
-    # Verificando se a quantidade de pistas está entre 1 e 80
-    if (quantidade < 1 or quantidade > 80):
+def validar_pistas(matriz, todas_pistas, modo_batch=False):
+    
+    # Verifica se há repetição de pistas
+    # Dicionário para armazenar as células ocupadas
+    celulas_ocupadas = {}
+    quantidade_pistas = 0
+    # Percorrendo todas as pistas
+    for linha, coluna, valor in todas_pistas:
+        celula = (linha, coluna)
+        if celula not in celulas_ocupadas:
+            celulas_ocupadas[celula] = int(valor)
+            quantidade_pistas += 1
+        # Verifica se há sobreposição de pistas e é modo batch
+        elif (celulas_ocupadas[celula] != int(valor)) and modo_batch:
+            raise Exception("Configuração de dicas inválida!")
+        
+    # Garante que o número de pistas está dentro do intervalo permitido (1 a 80)
+    if quantidade_pistas < 1 or quantidade_pistas > 80:
         raise Exception("Quantidade de pistas inválidas. Precisa haver uma quantidade de 1 até 80.")
+    
     # Verificando se os quadrantes estão preenchidos corretamente
     if not validar_quadrante(matriz):
-        raise Exception("Quadrantes inválidos. Há um valor repetido em algum quadrante.")
+        if modo_batch:
+            raise Exception("Configuração de dicas inválida!")
+        else:
+            raise Exception("Quadrantes inválidos. Há um valor repetido em algum quadrante.")
+        
     # Verificando se as linhas estão preenchidas corretamente
     if not validar_linhas(matriz):  
-        raise Exception("Linhas inválidas. Há um valor repetido em alguma linha.")
+        if modo_batch:
+            raise Exception("Configuração de dicas inválida!")
+        else:
+            raise Exception("Linhas inválidas. Há um valor repetido em alguma linha.")
+        
     # Verificando se as colunas estão preenchidas corretamente
     if not validar_colunas(matriz):
-        raise Exception("Colunas inválidas. Há um valor repetido em alguma coluna.")       
+        if modo_batch:
+            raise Exception("Configuração de dicas inválida!")
+        else:
+            raise Exception("Colunas inválidas. Há um valor repetido em alguma coluna.")
+
+# Função para validar jogadas em modo batch
+def validar_jogada_batch(matriz):
+    
+    # Verificando se os quadrantes estão preenchidos corretamente
+    if not validar_quadrante(matriz):
+        return False
+        
+    # Verificando se as linhas estão preenchidas corretamente
+    if not validar_linhas(matriz):  
+        return False
+        
+    # Verificando se as colunas estão preenchidas corretamente
+    if not validar_colunas(matriz):
+        return False
+
+    return True      
 
 # Função para transpor a matriz de pistas para o sudoku
-def matriz_pistas_para_sudoku():
+def matriz_para_sudoku():
     for i in range(9):
         for j in range(9):
-            sudoku[linha_sudoku[i]][coluna_sudoku[j]] = pintar(matriz[i][j])
+            sudoku[linha_sudoku[i]][coluna_sudoku[j]] = matriz[i][j]
+
+# Função para pintar o sudoku com as pistas
+def pintar_sudoku():
+    for i in range(9):
+        for j in range(9):
+            if matriz[i][j] != ' ':
+                # Pintando as pistas de vermelho
+                sudoku[linha_sudoku[i]][coluna_sudoku[j]] = pintar(matriz[i][j])
+            else:
+                # Mantendo o espaço vazio
+                sudoku[linha_sudoku[i]][coluna_sudoku[j]] = ' '
 
 # Função para inicializar o jogo
-def inicializar_jogo(pistas_arqv):
-    quantidade_pistas = ler_arquivo_pistas(pistas_arqv)
-    matriz_pistas_para_sudoku()
-    imprimir_matriz(sudoku)
-    validar_pistas(quantidade_pistas)
+def inicializar_jogo(pistas_arqv, modo_batch=False):
+    todas_pistas = ler_arquivo_pistas(pistas_arqv)
+    # Verificando se o modo não é batch
+    if not modo_batch: 
+        matriz_para_sudoku()
+        pintar_sudoku()
+        imprimir_matriz(sudoku)
+    # Validando as pistas
+    validar_pistas(matriz, todas_pistas, modo_batch)
+    return todas_pistas
 
 # Função para modo interativo
 def modo_interativo(pistas_arqv):
@@ -171,7 +255,34 @@ def modo_solucionador(pistas_arqv):
 # Função para modo batch
 def modo_batch(pistas_arqv, jogadas_arqv):
     try:
-        inicializar_jogo(pistas_arqv)
+        todas_pistas = inicializar_jogo(pistas_arqv, modo_batch=True)
+        todas_jogadas = ler_arquivo_jogadas(jogadas_arqv)
+
+        pistas_set = set()
+        for linha, coluna, _ in todas_pistas:
+            pistas_set.add((linha, coluna))
+
+        for linha, coluna, valor in todas_jogadas:
+            # Verifica se a jogada é uma pista
+            if (linha, coluna) in pistas_set:
+                print(f"A jogada ({coluna},{linha}) = {valor} é inválida!")
+            else:
+                matriz[linha_matriz[linha]][coluna_matriz[coluna]] = int(valor)
+                if not validar_jogada_batch(matriz):
+                    print(f"A jogada ({coluna},{linha}) = {valor} é inválida!")
+                    matriz[linha_matriz[linha]][coluna_matriz[coluna]] = ' '
+        
+        celulas_preenchidas = 0
+        for i in range(9):
+            for j in range(9):
+                if matriz[i][j] != ' ':
+                    celulas_preenchidas += 1
+
+        if celulas_preenchidas == 81:
+            print("A grade foi preenchida com sucesso!")
+        else:
+            print("A grade não foi preenchida!")
+
     except Exception as e:
         print(e)
 
@@ -199,6 +310,7 @@ def principal():
 
     # Verificando se o usuario entrou com dois arquivos
     elif (quantidade_arquivos == 2):
+        pistas_arqv= sys.argv[1]
         jogadas_arqv = sys.argv[2]
         modo_batch(pistas_arqv, jogadas_arqv)
 
