@@ -239,7 +239,68 @@ def inicializar_jogo(pistas_arqv, modo_batch=False):
 # Função para modo interativo
 def modo_interativo(pistas_arqv):
     try:
-        inicializar_jogo(pistas_arqv)
+        todas_pistas = inicializar_jogo(pistas_arqv)
+        pistas_set = set()
+        jogadas_set = set()
+        for linha, coluna, _ in todas_pistas:
+            pistas_set.add((linha, coluna))
+        
+        for i in range (3):    
+            jogada = input("Qual sua próxima jogada?\n")
+            if jogada[0] == "!":
+                apagar = jogada.split("!")
+                coluna_linha = apagar[1].split(",")
+                coluna = coluna_linha[0].strip().upper()
+                linha = coluna_linha[1].strip()
+                if coluna not in coluna_matriz or linha not in linha_matriz:
+                    print("O formato da jogada é inválido") 
+                else:
+                    if (linha, coluna) in pistas_set:
+                        print("Essa jogada é uma pista, não pode ser apagada")
+                    else:
+                        if (linha_matriz[linha], coluna_matriz[coluna]) in jogadas_set:
+                            matriz[linha_matriz[linha]][coluna_matriz[coluna]] = ' '
+                            matriz_para_sudoku(todas_pistas) 
+                            imprimir_matriz(sudoku)  
+                            jogadas_set.remove((linha_matriz[linha], coluna_matriz[coluna]))
+                        else:
+                            print("Espaço vazio, não há jogada para apagar")    
+            else:
+                jogadas = jogada.split(',')
+                linha_valor = jogadas[1].split(':')   
+                coluna = jogadas[0].strip().upper()
+                linha = linha_valor[0].strip()
+                valor_jogada = int(linha_valor[1].strip())   
+                if coluna not in coluna_matriz or linha not in linha_matriz or valor_jogada not in range(1, 10):
+                    print("O formato da jogada é inválido")  
+                else:    
+                    coluna_jogada = coluna_matriz[coluna]
+                    linha_jogada = linha_matriz[linha]
+                    if (linha, coluna) in pistas_set:
+                        print("Está tentando alterar uma pista, o que não é permitido")
+                    elif (linha_jogada, coluna_jogada) in jogadas_set:
+                        print("Já existe uma jogada nessa posição, deseja alterar?, caso sim digite 1, caso não digite 2") 
+                        sobreposicao = input()
+                        if sobreposicao == '1':
+                            matriz[linha_jogada][coluna_jogada] = valor_jogada
+                            if validar_colunas(matriz) and validar_colunas(matriz) and validar_quadrante(matriz):
+                                matriz_para_sudoku(todas_pistas) 
+                                imprimir_matriz(sudoku)
+                                jogadas_set.add((linha_jogada, coluna_jogada))
+                            else:
+                                print("Jogada inválida")
+                                matriz[linha_jogada][coluna_jogada] = ' '    
+                        else:
+                            print("Jogada não realizada")
+                    else:            
+                        matriz[linha_jogada][coluna_jogada] = valor_jogada
+                        if validar_colunas(matriz) and validar_colunas(matriz) and validar_quadrante(matriz):
+                            matriz_para_sudoku(todas_pistas) 
+                            imprimir_matriz(sudoku)
+                            jogadas_set.add((linha_jogada, coluna_jogada))
+                        else:
+                            print("Jogada inválida")
+                            matriz[linha_jogada][coluna_jogada] = ' '    
     except Exception as e:
         print(e)
 
