@@ -210,29 +210,27 @@ def validar_jogada_batch(matriz):
     return True      
 
 # Função para transpor a matriz de pistas para o sudoku
-def matriz_para_sudoku():
+def matriz_para_sudoku(todas_pistas):
+    
+    pistas_set = set()
+    for linha, coluna, _ in todas_pistas:
+        pistas_set.add((linha_matriz[linha], coluna_matriz[coluna]))
+    
     for i in range(9):
         for j in range(9):
-            sudoku[linha_sudoku[i]][coluna_sudoku[j]] = matriz[i][j]
-
-# Função para pintar o sudoku com as pistas
-def pintar_sudoku():
-    for i in range(9):
-        for j in range(9):
-            if matriz[i][j] != ' ':
-                # Pintando as pistas de vermelho
+            if (i, j) in pistas_set:
+                # É uma pista e deve ser pintada
                 sudoku[linha_sudoku[i]][coluna_sudoku[j]] = pintar(matriz[i][j])
             else:
-                # Mantendo o espaço vazio
-                sudoku[linha_sudoku[i]][coluna_sudoku[j]] = ' '
+                # É um espaço vazio ou é uma jogada
+                sudoku[linha_sudoku[i]][coluna_sudoku[j]] = str(matriz[i][j])
 
 # Função para inicializar o jogo
 def inicializar_jogo(pistas_arqv, modo_batch=False):
     todas_pistas = ler_arquivo_pistas(pistas_arqv)
     # Verificando se o modo não é batch
     if not modo_batch: 
-        matriz_para_sudoku()
-        pintar_sudoku()
+        matriz_para_sudoku(todas_pistas)
         imprimir_matriz(sudoku)
     # Validando as pistas
     validar_pistas(matriz, todas_pistas, modo_batch)
