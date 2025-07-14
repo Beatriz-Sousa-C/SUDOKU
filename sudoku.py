@@ -1,3 +1,4 @@
+
 # Beatriz Sousa da Cruz (578714), Isabella Lelis Moreno (581611), Iuri Castro Bessa (587787).
 
 import sys
@@ -309,7 +310,7 @@ def modo_interativo(pistas_arqv):
                         sobreposicao = input()
                         if sobreposicao == '1':
                             matriz[linha_jogada][coluna_jogada] = valor_jogada
-                            if validar_colunas(matriz) and validar_colunas(matriz) and validar_quadrante(matriz):
+                            if validar_linhas(matriz) and validar_colunas(matriz) and validar_quadrante(matriz):
                                 matriz_para_sudoku(todas_pistas) 
                                 imprimir_matriz(sudoku)
                                 jogadas_set.add((linha_jogada, coluna_jogada))
@@ -320,7 +321,7 @@ def modo_interativo(pistas_arqv):
                             print("Jogada não realizada")
                     else:            
                         matriz[linha_jogada][coluna_jogada] = valor_jogada
-                        if validar_colunas(matriz) and validar_colunas(matriz) and validar_quadrante(matriz):
+                        if validar_linhas(matriz) and validar_colunas(matriz) and validar_quadrante(matriz):
                             matriz_para_sudoku(todas_pistas) 
                             imprimir_matriz(sudoku)
                             jogadas_set.add((linha_jogada, coluna_jogada))
