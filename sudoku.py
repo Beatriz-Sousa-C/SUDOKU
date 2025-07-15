@@ -331,10 +331,40 @@ def modo_interativo(pistas_arqv):
     except Exception as e:
         print(e)
 
+#Função do modo solucionador
+def solucionar_sudoku(matriz):
+    for i in range(9):
+        for j in range(9):
+            if matriz[i][j] == ' ':
+                for valor in range(1, 10):
+                    matriz[i][j] = valor
+                    if validar_colunas(matriz) and validar_linhas(matriz) and validar_quadrante(matriz):
+                        if solucionar_sudoku(matriz):
+                            return True
+                    matriz[i][j] = ' ' # Backtracking
+                return False
+    return True
+
 # Função para modo solucionador
 def modo_solucionador(pistas_arqv):
     try:
-        inicializar_jogo(pistas_arqv)
+        # Iniciando jogo com as pistas e recebendo todas as pistas
+        todas_pistas = inicializar_jogo(pistas_arqv)
+    
+        resposta = input("Deseja continuar? Digite 'sim' para prossegir e 'nao' para parar\n")
+
+        if resposta == 'sim':
+            #função que mostra se o sudoku foi resolvido
+            if solucionar_sudoku(matriz):
+                matriz_para_sudoku(todas_pistas) 
+                imprimir_matriz(sudoku)
+                print("Sudoku resolvido com sucesso!")
+                            
+            else:
+                #falta mostrar a grade caso nao seja resolvido
+                print("Não foi possível resolver o Sudoku.")
+               
+                        
     except Exception as e:
         print(e)
 
