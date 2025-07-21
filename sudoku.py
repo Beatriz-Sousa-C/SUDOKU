@@ -384,16 +384,59 @@ def modo_interativo(pistas_arqv):
     except Exception as e:
         print(e)
 
+#Matriz cópia para salvar cada jogada no modo solucionador
+copia = []
+
+# Dicionário com as colunas da matriz cópia para salvar cada jogada no modo solucionador
+coluna_copia= {"A" : 0, "B" : 1, "C" : 2, "D" : 3, "E" : 4, "F" : 5, "G" : 6, "H" : 7, "I" : 8}
+
+# Dicionário com as linhas da matriz copia para salvar cada jogada no modo solucionador
+linha_copia = {"1" : 0 , "2" : 1, "3" : 2, "4" : 3, "5" : 4, "6" : 5, "7" : 6, "8" : 7, "9" : 8} 
+
+
+#Função para transpor a matriz cópia do modo solucionador para a grade do sudoku
+def copia_para_sudoku(todas_pistas):
+    # Criando um conjunto para guardar as posicoes das pistas
+    pistas_set = set()
+
+    # Percorrendo a lista de todas as pistas
+    for linha, coluna, _ in todas_pistas:
+        # Adicionando a pista ao conjunto
+        pistas_set.add((linha_copia[linha], coluna_copia[coluna]))
+    
+    # Preenchendo o sudoku e verificando se é uma pista ou não
+    for i in range(9):
+        for j in range(9):
+            if (i, j) in pistas_set:
+                # É uma pista e deve ser pintada
+                sudoku[linha_sudoku[i]][coluna_sudoku[j]] = pintar(copia[i][j])
+            else:
+                # É um espaço vazio ou é uma jogada
+                sudoku[linha_sudoku[i]][coluna_sudoku[j]] = str(copia[i][j])
+
+
+#Contador para saber se meu sudoku já foi todo preenchido no modo solucionador
+celulasPreenchidas = 0
+
 #Função do modo solucionador
 def solucionar_sudoku(matriz):
+    global copia, celulasPreenchidas
+
     for i in range(9):
         for j in range(9):
             if matriz[i][j] == ' ':
                 for valor in range(1, 10):
                     matriz[i][j] = valor
                     if validar_colunas(matriz) and validar_linhas(matriz) and validar_quadrante(matriz):
+                        
                         if solucionar_sudoku(matriz):
                             return True
+                        
+                    celulasPreenchidas += 1
+
+                    if celulasPreenchidas < 81:
+                        copia = [row[:] for row in matriz]
+
                     matriz[i][j] = ' ' # Backtracking
                 return False
     return True
@@ -414,8 +457,9 @@ def modo_solucionador(pistas_arqv):
                 print("Sudoku resolvido com sucesso!")
                             
             else:
-                #falta mostrar a grade caso nao seja resolvido
-                print("Não foi possível resolver o Sudoku.")
+                copia_para_sudoku(todas_pistas) 
+                imprimir_matriz(sudoku)
+                print("Não foi possível resolver o Sudoku. Grade com o progresso alcançado")
                
                         
     except Exception as e:
