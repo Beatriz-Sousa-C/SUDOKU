@@ -321,7 +321,7 @@ def modo_interativo(pistas_arqv):
                 else:
                     # Verifica se a jogada é uma pista
                     if (linha, coluna) in pistas_set:
-                        print("Essa jogada é uma pista, não pode ser apagada")
+                        print("Não há outras possibilidades para se colocar nesse espaço porque ele é uma pista, e uma pista sempre está correta")
                     else:
                         possibilidades = []
                         # Caso não tenha restrições, verifica quais são as possibilidades
@@ -428,17 +428,18 @@ def solucionar_sudoku(matriz):
                 for valor in range(1, 10):
                     matriz[i][j] = valor
                     if validar_colunas(matriz) and validar_linhas(matriz) and validar_quadrante(matriz):
-                        
+
                         if solucionar_sudoku(matriz):
                             return True
                         
                     celulasPreenchidas += 1
 
+                    # Backtracking
+                    matriz[i][j] = ' '
+
                     if celulasPreenchidas < 81:
                         copia = [row[:] for row in matriz]
                     
-                    # Backtracking
-                    matriz[i][j] = ' '
                 return False
     return True
 
