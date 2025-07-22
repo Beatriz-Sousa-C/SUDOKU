@@ -273,33 +273,33 @@ def modo_interativo(pistas_arqv):
         # Percorrendo a lista de todas as pistas e adicionando ao conjunto 
         for linha, coluna, _ in todas_pistas:
             pistas_set.add((linha, coluna))
-        #loop para ver quantas pistas foram colocadas na matriz
+        # Loop para ver quantas pistas foram colocadas na matriz
         celulas_preenchidas = 0
         for i in range(9):
             for j in range(9):
                 # Verificando se a célula está preenchida
                 if matriz[i][j] != ' ':
                     celulas_preenchidas += 1
-            #contador para saber quando para o jogo        
+            # Contador para saber quando para o jogo        
             contador = celulas_preenchidas    
         while contador < 81:  
             jogada = input("Qual sua próxima jogada?\n")
-            #caso o jogador queira apagar uma jogada
+            # Caso o jogador queira apagar uma jogada
             if jogada[0] == "!":
-                #Isola os dados da jogada
+                # Isola os dados da jogada
                 apagar = jogada.split("!")
                 coluna_linha = apagar[1].split(",")
                 coluna = coluna_linha[0].strip().upper()
                 linha = coluna_linha[1].strip()
-                #Verifica se a coluna e linha estão no dicionário
+                # Verifica se a coluna e linha estão no dicionário
                 if coluna not in coluna_matriz or linha not in linha_matriz:
                     print("O formato da jogada é inválido") 
                 else:
-                    #Verifica se a jogada é uma pista
+                    # Verifica se a jogada é uma pista
                     if (linha, coluna) in pistas_set:
                         print("Essa jogada é uma pista, não pode ser apagada")
                     else:
-                        #caso não tenha restrições, apaga a jogada
+                        # Caso não tenha restrições, apaga a jogada
                         if (linha_matriz[linha], coluna_matriz[coluna]) in jogadas_set:
                             matriz[linha_matriz[linha]][coluna_matriz[coluna]] = ' '
                             matriz_para_sudoku(todas_pistas) 
@@ -308,48 +308,48 @@ def modo_interativo(pistas_arqv):
                             contador -= 1
                         else:
                             print("Espaço vazio, não há jogada para apagar")
-            #caso o jogador tenha duvida quanto a quais as possíveis possibilidades de determinado espaço                
+            # Caso o jogador tenha duvida quanto a quais as possíveis possibilidades de determinado espaço                
             elif jogada[0] == '?':
-                #Isola os dados da jogada
+                # Isola os dados da jogada
                 apagar = jogada.split("?")
                 coluna_linha = apagar[1].split(",")
                 coluna = coluna_linha[0].strip().upper()
                 linha = coluna_linha[1].strip()
-                #Verifica se a coluna e linha estão no dicionário
+                # Verifica se a coluna e linha estão no dicionário
                 if coluna not in coluna_matriz or linha not in linha_matriz:
                     print("O formato da jogada é inválido") 
                 else:
-                    #Verifica se a jogada é uma pista
+                    # Verifica se a jogada é uma pista
                     if (linha, coluna) in pistas_set:
                         print("Essa jogada é uma pista, não pode ser apagada")
                     else:
                         possibilidades = []
-                        #caso não tenha restrições, verifica quais são as possibilidades
+                        # Caso não tenha restrições, verifica quais são as possibilidades
                         for i in range(1, 10):
                             matriz[linha_matriz[linha]][coluna_matriz[coluna]] = i
                             if validar_linhas(matriz) and validar_colunas(matriz) and validar_quadrante(matriz):
                                 possibilidades.append(i)
                             matriz[linha_matriz[linha]][coluna_matriz[coluna]] = ' '
                         print("Possibilidades de jogada nesse espaço:", end=" ")
-                        #Loop para imprimir as possibilidades    
+                        # Loop para imprimir as possibilidades    
                         for i in range (len(possibilidades)):
                             if i == len(possibilidades) - 1:
                                 print(possibilidades[i])
                             else:
                                 print(str(possibilidades[i]) + ",", end=" ")
-            #caso o jogador queira fazer uma jogada                    
+            # Caso o jogador queira fazer uma jogada                    
             else:
-                #Isola os dados da jogada
+                # Isola os dados da jogada
                 jogadas = jogada.split(',')
                 linha_valor = jogadas[1].split(':')   
                 coluna = jogadas[0].strip().upper()
                 linha = linha_valor[0].strip()
                 valor_jogada = int(linha_valor[1].strip())
-                #Verifica se a coluna e linha estão no dicionário   
+                # Verifica se a coluna e linha estão no dicionário   
                 if coluna not in coluna_matriz or linha not in linha_matriz or valor_jogada not in range(1, 10):
                     print("O formato da jogada é inválido")  
                 else:    
-                    #Verifica se a jogada é uma pista
+                    # Verifica se a jogada é uma pista
                     coluna_jogada = coluna_matriz[coluna]
                     linha_jogada = linha_matriz[linha]
                     if (linha, coluna) in pistas_set:
@@ -357,7 +357,7 @@ def modo_interativo(pistas_arqv):
                     # Verifica se uma jogada já foi feita nessa posição
                     elif (linha_jogada, coluna_jogada) in jogadas_set:
                         print("Já existe uma jogada nessa posição, deseja alterar?, caso sim digite 1, caso não digite 2") 
-                        #Pergunta se o jogador quer alterar a jogada, e caso queira altera
+                        # Pergunta se o jogador quer alterar a jogada, e caso queira altera
                         sobreposicao = input()
                         if sobreposicao == '1':
                             matriz[linha_jogada][coluna_jogada] = valor_jogada
@@ -371,7 +371,7 @@ def modo_interativo(pistas_arqv):
                         else:
                             print("Jogada não realizada")
                     else:
-                        #Adiciona a jogada na matriz            
+                        # Adiciona a jogada na matriz            
                         matriz[linha_jogada][coluna_jogada] = valor_jogada
                         if validar_linhas(matriz) and validar_colunas(matriz) and validar_quadrante(matriz):
                             matriz_para_sudoku(todas_pistas) 
@@ -384,7 +384,7 @@ def modo_interativo(pistas_arqv):
     except Exception as e:
         print(e)
 
-#Matriz cópia para salvar cada jogada no modo solucionador
+# Matriz cópia para salvar cada jogada no modo solucionador
 copia = []
 
 # Dicionário com as colunas da matriz cópia para salvar cada jogada no modo solucionador
@@ -394,7 +394,7 @@ coluna_copia= {"A" : 0, "B" : 1, "C" : 2, "D" : 3, "E" : 4, "F" : 5, "G" : 6, "H
 linha_copia = {"1" : 0 , "2" : 1, "3" : 2, "4" : 3, "5" : 4, "6" : 5, "7" : 6, "8" : 7, "9" : 8} 
 
 
-#Função para transpor a matriz cópia do modo solucionador para a grade do sudoku
+# Função para transpor a matriz cópia do modo solucionador para a grade do sudoku
 def copia_para_sudoku(todas_pistas):
     # Criando um conjunto para guardar as posicoes das pistas
     pistas_set = set()
@@ -415,10 +415,10 @@ def copia_para_sudoku(todas_pistas):
                 sudoku[linha_sudoku[i]][coluna_sudoku[j]] = str(copia[i][j])
 
 
-#Contador para saber se meu sudoku já foi todo preenchido no modo solucionador
+# Contador para saber se meu sudoku já foi todo preenchido no modo solucionador
 celulasPreenchidas = 0
 
-#Função do modo solucionador
+# Função do modo solucionador
 def solucionar_sudoku(matriz):
     global copia, celulasPreenchidas
 
@@ -436,8 +436,9 @@ def solucionar_sudoku(matriz):
 
                     if celulasPreenchidas < 81:
                         copia = [row[:] for row in matriz]
-
-                    matriz[i][j] = ' ' # Backtracking
+                    
+                    # Backtracking
+                    matriz[i][j] = ' '
                 return False
     return True
 
@@ -450,7 +451,7 @@ def modo_solucionador(pistas_arqv):
         resposta = input("Deseja continuar? Digite 'sim' para prossegir e 'nao' para parar\n")
 
         if resposta == 'sim':
-            #função que mostra se o sudoku foi resolvido
+            # Função que mostra se o sudoku foi resolvido
             if solucionar_sudoku(matriz):
                 matriz_para_sudoku(todas_pistas) 
                 imprimir_matriz(sudoku)
